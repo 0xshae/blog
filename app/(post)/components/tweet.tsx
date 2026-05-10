@@ -23,14 +23,14 @@ async function getAndCacheTweet(id: string): Promise<Tweet | undefined> {
     // @ts-ignore
     if (tweet && !tweet.tombstone) {
       // we populate the cache if we have a fresh tweet
-      await redis.set(`tweet:${id}`, tweet);
+      if (redis) await redis.set(`tweet:${id}`, tweet);
       return tweet;
     }
   } catch (error) {
     console.error("tweet fetch error", error);
   }
 
-  const cachedTweet: Tweet | null = await redis.get(`tweet:${id}`);
+  const cachedTweet: Tweet | null = redis ? await redis.get(`tweet:${id}`) : null;
 
   // @ts-ignore
   if (!cachedTweet || cachedTweet.tombstone) return undefined;
